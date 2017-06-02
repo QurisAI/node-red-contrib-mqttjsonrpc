@@ -1,0 +1,34 @@
+{
+  "name": "node-red-contrib-jsonrpc",
+  "version": "0.0.1",
+  "description": "Node RED wrapper around a JSON RPC 2.0 implementation.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/technocreatives/node-red-contrib-jsonrpc.git"
+  },
+  "bugs": {
+    "url": "https://github.com/technocreatives/node-red-contrib-jsonrpc/issues"
+  },
+  "homepage": "https://github.com/technocreatives/node-red-contrib-jsonrpc#readme",
+  "node-red": {
+    "nodes": {
+      "jsonrpc": "jsonrpc/jsonrpc.js"
+    }
+  },
+  "keywords": [
+    "json",
+    "rpc",
+    "node-red"
+  ],
+  "author": "david.goransson90@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "mqtt": "^2.8.0",
+    "uuid": "^3.0.1"
+  }
+}
