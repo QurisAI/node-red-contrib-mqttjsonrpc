@@ -8,6 +8,11 @@
     </div>
 
     <div class="form-row">
+        <label for="node-config-input-namespace"><i class="fa fa-user"></i> Namespace</label>
+        <input type="text" id="node-config-input-namespace">
+    </div>
+
+    <div class="form-row">
         <label for="node-config-input-host"><i class="fa fa-user"></i> Host</label>
         <input type="text" id="node-config-input-host">
     </div>
@@ -23,8 +28,9 @@
         category: 'config',
         defaults: {
             name:      { value:"" },
+            namespace: { value:"default" },
             host:      { value:"localhost", required: true },
-            port:      { value:"8000", required: true },
+            port:      { value:"1880", required: true },
         },
         label: function() {
             return this.name || "";
@@ -32,7 +38,7 @@
     });
 </script>
 
-<script type="text/x-red" data-template-name="mqtt jsonrpc call">
+<script type="text/x-red" data-template-name="mqtt jsonrpc request">
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name">
@@ -47,13 +53,13 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="mqtt jsonrpc call">
+<script type="text/x-red" data-help-name="mqtt jsonrpc request">
     <p>Performs a method call to an JSON RPC server.</p>
     <p>Outputs the returned value.</p>
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('mqtt jsonrpc call',{
+    RED.nodes.registerType('mqtt jsonrpc request',{
         category: 'function',
         defaults: {
             name: {value:""},
