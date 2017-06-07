@@ -54,8 +54,8 @@ module.exports = function(RED) {
 
 
         // Create the config node individual namespace
-        this.mqttNameSpaceTopic    = 'mqttjsonrpc/' + this.namespace + '/';
-        this.mqttMethodTopicBase   = this.mqttNameSpaceTopic + 'method/';
+        this.mqttNameSpaceTopic = 'mqttjsonrpc/' + this.namespace + '/';
+        this.mqttMethodTopicBase = this.mqttNameSpaceTopic + 'method/';
         this.mqttResponseTopicBase = this.mqttNameSpaceTopic + 'response/';
 
         // Node state
@@ -66,7 +66,7 @@ module.exports = function(RED) {
         this.setState = function(newState, message) {
             node.state = newState;
             var statusConfig = state.properties[newState];
-            if (message){
+            if (message) {
                 statusConfig.message = message;
             }
 
@@ -79,7 +79,7 @@ module.exports = function(RED) {
 
         this.setState(state.CONNECTING);
 
-        this.connect = function () {
+        this.connect = function() {
 
             node.client = mqtt.connect([{
                 host: this.host,
@@ -89,55 +89,55 @@ module.exports = function(RED) {
             node.client.subscribe(node.mqttMethodTopicBase + '+');
             node.client.subscribe(node.mqttResponseTopicBase + '+');
 
-            node.client.methodHandlers   = {};
+            node.client.methodHandlers = {};
             node.client.responseHandlers = {};
 
             // Update client based on the state
-            node.client.on('connect', function (){
+            node.client.on('connect', function() {
                 node.setState(state.CONNECTED);
             });
 
-            node.client.on('reconnect', function (){
+            node.client.on('reconnect', function() {
                 node.setState(state.CONNECTING, 'reconnecting');
             });
 
-            node.client.on('close', function (){
+            node.client.on('close', function() {
                 node.setState(state.CLOSED);
             });
 
-            node.client.on('offline', function (){
+            node.client.on('offline', function() {
                 node.setState(state.OFFLINE);
             });
 
-            node.client.on('error', function (error){
+            node.client.on('error', function(error) {
                 node.setState(state.ERROR, 'error: ' + error.message);
                 setTimeout(function() {
                     node.connect();
                 }, 1000);
             });
 
-            node.client.on('message', function (topic, msg){
+            node.client.on('message', function(topic, msg) {
                 var msgObject;
                 try {
                     msgObject = JSON.parse(msg);
 
-                } catch (error){
+                } catch (error) {
                     node.error(RED._('Invalid JSON object: ' + msg));
                     return;
                 }
 
-                if(topic.startsWith(node.mqttMethodTopicBase)){
+                if (topic.startsWith(node.mqttMethodTopicBase)) {
                     // Method was called
-                    if(_.has(node.client.methodHandlers, topic)){
+                    if (_.has(node.client.methodHandlers, topic)) {
                         node.client.methodHandlers[topic](msgObject);
                     } else {
                         node.error(RED._('Invalid method  object: ' + msg));
                         return;
                     }
 
-                } else if (topic.startsWith(node.mqttResponseTopicBase)){
+                } else if (topic.startsWith(node.mqttResponseTopicBase)) {
                     // Response called
-                    if(_.has(node.client.responseHandlers, topic)){
+                    if (_.has(node.client.responseHandlers, topic)) {
                         node.client.responseHandlers[topic](msgObject);
                         node.unregisterResponseHandle(topic);
                     } else {
@@ -149,28 +149,28 @@ module.exports = function(RED) {
             });
         };
 
-        this.registerResponseHandle = function (topic, handle){
+        this.registerResponseHandle = function(topic, handle) {
             node.client.responseHandlers[topic] = handle;
         };
 
-        this.unregisterResponseHandle = function (topic){
+        this.unregisterResponseHandle = function(topic) {
             delete node.client.responseHandlers[topic];
         };
 
-        this.callRPC = function (method, msg){
+        this.callRPC = function(method, msg) {
             var topic = node.mqttMethodTopicBase + method;
             node.client.publish(topic, JSON.stringify(msg));
         };
 
-        this.respond = function (msg){
-            if(!_.has(msg, '_rpc.topic')){
+        this.respond = function(msg) {
+            if (!_.has(msg, '_rpc.topic')) {
                 node.error(RED._('Invalid msg, no _rpc object attached.'));
                 return;
             }
 
             var topic = msg._rpc.topic;
 
-            if(!_.has(node.client.responseHandlers, topic)){
+            if (!_.has(node.client.responseHandlers, topic)) {
                 node.error(RED._('Response topic is not registered, already used?'));
                 return;
             }
@@ -180,17 +180,17 @@ module.exports = function(RED) {
             node.client.publish(topic, JSON.stringify(msg));
         };
 
-        this.registerMethod = function (method, handle){
+        this.registerMethod = function(method, handle) {
             var topic = node.mqttMethodTopicBase + method;
             node.client.methodHandlers[topic] = handle;
         };
 
-        this.unregisterMethod = function (method){
+        this.unregisterMethod = function(method) {
             var topic = node.mqttMethodTopicBase + method;
             delete node.client.methodHandlers[topic];
         };
 
-        this.isRegisteredMethod = function (method){
+        this.isRegisteredMethod = function(method) {
             var topic = node.mqttMethodTopicBase + method;
             return _.has(node.client.methodHandlers, topic);
         };
@@ -216,9 +216,9 @@ module.exports = function(RED) {
     RED.nodes.registerType('mqtt jsonrpc client config', JsonRpcClientNode);
 
 
-    // *****************
+    // ********************
     // * RPC Request Node *
-    // *****************
+    // ********************
     function JsonRpcRequestNode(n) {
         RED.nodes.createNode(this, n);
         this.method = n.method;
@@ -236,7 +236,7 @@ module.exports = function(RED) {
         this.on('input', function(msg) {
             var method = msg.method || node.method;
             // Generate a unique response topic
-            var mqttResponseTopic = this.mqttNode.mqttResponseTopicBase + uuid.v4(); 
+            var mqttResponseTopic = this.mqttNode.mqttResponseTopicBase + uuid.v4();
 
             // Add RPC to 
             msg._rpc = {
@@ -280,7 +280,7 @@ module.exports = function(RED) {
             return;
         }
 
-        var handle = function (msg){
+        var handle = function(msg) {
             msg._rpc.mqttNode = n.client;
             node.send(msg);
         };
