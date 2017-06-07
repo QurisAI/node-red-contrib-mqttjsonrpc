@@ -1,5 +1,5 @@
 {
-  "name": "node-red-contrib-jsonrpc",
+  "name": "node-red-contrib-mqttjsonrpc",
   "version": "0.0.1",
   "description": "Node RED wrapper around a JSON RPC 2.0 implementation.",
   "main": "index.js",
@@ -8,12 +8,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/technocreatives/node-red-contrib-jsonrpc.git"
+    "url": "git+https://github.com/technocreatives/node-red-contrib-mqttjsonrpc.git"
   },
   "bugs": {
-    "url": "https://github.com/technocreatives/node-red-contrib-jsonrpc/issues"
+    "url": "https://github.com/technocreatives/node-red-contrib-mqttjsonrpc/issues"
   },
-  "homepage": "https://github.com/technocreatives/node-red-contrib-jsonrpc#readme",
+  "homepage": "https://github.com/technocreatives/node-red-contrib-mqttjsonrpc#readme",
   "node-red": {
     "nodes": {
       "jsonrpc": "jsonrpc/jsonrpc.js"
