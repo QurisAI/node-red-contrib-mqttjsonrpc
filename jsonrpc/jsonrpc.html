@@ -30,7 +30,7 @@
             name:      { value:"" },
             namespace: { value:"default" },
             host:      { value:"localhost", required: true },
-            port:      { value:"1880", required: true },
+            port:      { value:"1880", required: true, validate:RED.validators.number() },
         },
         label: function() {
             return this.name || "";
@@ -51,6 +51,10 @@
         <label for="node-input-method"><i class="fa fa-tasks"></i> Method</label>
         <input type="text" id="node-input-method">
     </div>
+    <div class="form-row">
+        <label for="node-input-timeout"><i class="fa fa-clock-o"></i> Timeout</label>
+        <input type="text" id="node-input-timeout">
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="mqtt jsonrpc request">
@@ -64,7 +68,8 @@
         defaults: {
             name: {value:""},
             method: {value:""},
-            client: {type:"mqtt jsonrpc client config", required:true}
+            client: {type:"mqtt jsonrpc client config", required:true},
+            timeout: {value:"0", required:true, validate:RED.validators.number()}
         },
         color:"#d8d8bf",
         inputs:1,

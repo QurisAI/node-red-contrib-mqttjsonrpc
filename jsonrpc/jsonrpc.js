@@ -86,7 +86,6 @@ module.exports = function(RED) {
                 port: this.port
             }]);
 
-            node.client.subscribe(node.mqttMethodTopicBase + '+');
             node.client.subscribe(node.mqttResponseTopicBase + '+');
 
             node.client.methodHandlers = {};
@@ -131,7 +130,7 @@ module.exports = function(RED) {
                     if (_.has(node.client.methodHandlers, topic)) {
                         node.client.methodHandlers[topic](msgObject);
                     } else {
-                        node.error(RED._('Invalid method  object: ' + msg));
+                        node.error(RED._('Invalid method topic: ' + msg + ', incorrect namespace or method not registered?'));
                         return;
                     }
 
@@ -182,11 +181,14 @@ module.exports = function(RED) {
 
         this.registerMethod = function(method, handle) {
             var topic = node.mqttMethodTopicBase + method;
+            node.client.subscribe(node.mqttMethodTopicBase + '+');
             node.client.methodHandlers[topic] = handle;
         };
 
         this.unregisterMethod = function(method) {
             var topic = node.mqttMethodTopicBase + method;
+            //TODO Fix unsubscribe
+            node.client.unsubscribe(node.mqttMethodTopicBase + method);
             delete node.client.methodHandlers[topic];
         };
 
@@ -222,6 +224,7 @@ module.exports = function(RED) {
     function JsonRpcRequestNode(n) {
         RED.nodes.createNode(this, n);
         this.method = n.method;
+        this.timeout = parseInt(n.timeout);
         this.mqttNode = RED.nodes.getNode(n.client);
 
         var node = this;
@@ -243,7 +246,6 @@ module.exports = function(RED) {
                 topic: mqttResponseTopic
             };
 
-            console.log('registerering mqttResponseTopic');
             node.mqttNode.registerResponseHandle(mqttResponseTopic, function(msg) {
                 node.send(msg);
             });
@@ -251,7 +253,16 @@ module.exports = function(RED) {
             // Make the request
             node.mqttNode.callRPC(method, msg);
 
-            // TODO allow for timeout?
+            if (0 < this.timeout) {
+                setTimeout(function() {
+                    node.mqttNode.unregisterResponseHandle(mqttResponseTopic);
+                    msg.error = {
+                        message: 'Request timed out',
+                        name: 'timeout'
+                    };
+                    node.send(msg);
+                }, this.timeout);
+            }
         });
 
         this.on('close', function(done) {
@@ -284,7 +295,6 @@ module.exports = function(RED) {
             msg._rpc.mqttNode = n.client;
             node.send(msg);
         };
-
 
         this.mqttNode.registerMethod(this.method, handle);
 
