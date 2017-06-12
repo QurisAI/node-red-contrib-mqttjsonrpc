@@ -139,8 +139,6 @@ module.exports = function(RED) {
                     if (_.has(node.client.responseHandlers, topic)) {
                         node.client.responseHandlers[topic](msgObject);
                         node.unregisterResponseHandle(topic);
-                    } else {
-                        node.error(RED._('Non-registered response, response already used?'));
                     }
                 } else {
                     node.error(RED._('No registered handler for the topic: ' + topic));
@@ -168,12 +166,6 @@ module.exports = function(RED) {
             }
 
             var topic = msg._rpc.topic;
-
-            if (!_.has(node.client.responseHandlers, topic)) {
-                node.error(RED._('Response topic is not registered, already used?'));
-                return;
-            }
-
             delete msg._rpc;
 
             node.client.publish(topic, JSON.stringify(msg));
