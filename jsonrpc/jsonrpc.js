@@ -51,6 +51,8 @@ module.exports = function(RED) {
         this.host = n.host;
         this.port = parseInt(n.port);
         this.namespace = n.namespace;
+        this.username = n.username;
+        this.password = n.password;
 
 
         // Create the config node individual namespace
@@ -81,10 +83,12 @@ module.exports = function(RED) {
 
         this.connect = function() {
 
-            node.client = mqtt.connect([{
+            node.client = mqtt.connect(this.host, {
                 host: this.host,
-                port: this.port
-            }]);
+                port: this.port,
+                username: this.username,
+                password: this.password
+            });
 
             node.client.subscribe(node.mqttResponseTopicBase + '+');
 
