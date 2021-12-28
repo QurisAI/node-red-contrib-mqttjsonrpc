@@ -29,20 +29,22 @@
     
     <div class="form-row">
         <label for="node-config-input-password"><i class="fa fa-user"></i> Password</label>
-        <input type="text" id="node-config-input-password">
+        <input type="password" id="node-config-input-password">
     </div>
 </script>
 
 <script type="text/javascript">
     RED.nodes.registerType('mqtt jsonrpc client config',{
         category: 'config',
+	credentials: {
+	    username: {type: "text"},
+            password: {type: "password"}
+	},
         defaults: {
             name:      { value:"" },
             namespace: { value:"default" },
             host:      { value:"localhost", required: true },
             port:      { value:"1880", required: true, validate:RED.validators.number() },
-            username:  { value: "" },
-            password:  { value: "" },
         },
         label: function() {
             return this.name || "";

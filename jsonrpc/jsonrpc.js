@@ -51,8 +51,8 @@ module.exports = function(RED) {
         this.host = n.host;
         this.port = parseInt(n.port);
         this.namespace = n.namespace;
-        this.username = n.username;
-        this.password = n.password;
+        this.username = this.credentials.username;
+        this.password = this.credentials.password;
 
 
         // Create the config node individual namespace
@@ -87,7 +87,8 @@ module.exports = function(RED) {
                 host: this.host,
                 port: this.port,
                 username: this.username,
-                password: this.password
+                password: this.password,
+		reconnectPeriod: 0
             });
 
             node.client.subscribe(node.mqttResponseTopicBase + '+');
@@ -113,7 +114,7 @@ module.exports = function(RED) {
             });
 
             node.client.on('error', function(error) {
-                node.setState(state.ERROR, 'error: ' + error.message);
+                node.setState(state.FAILED, 'error: ' + error.message);
                 setTimeout(function() {
                     node.connect();
                 }, 1000);
@@ -211,7 +212,12 @@ module.exports = function(RED) {
             node.client.end();
         });
     }
-    RED.nodes.registerType('mqtt jsonrpc client config', JsonRpcClientNode);
+    RED.nodes.registerType('mqtt jsonrpc client config', JsonRpcClientNode, {
+	credentials: {
+	  username: {type: "text"},
+	  password: {type: "password"}
+	}
+});
 
 
     // ********************
